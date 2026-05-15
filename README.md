@@ -73,6 +73,87 @@ Open `yanki.ipynb` in Jupyter and execute the cells in order:
 2. Database connection and schema/table creation
 3. Data loading into PostgreSQL
 
+### 6. Access PostgreSQL from Terminal
+
+Use any of the following methods to connect with `psql` from your terminal.
+
+Option A: Connect directly to the target database
+
+```sh
+psql -h localhost -U postgres -d yanki_ecommerce
+```
+
+Option B: Use environment variables from `.env`
+
+```sh
+export PGHOST=localhost
+export PGUSER=postgres
+export PGPASSWORD=your_password
+export PGDATABASE=yanki_ecommerce
+psql
+```
+
+Option C: Connect first to the default database and switch
+
+```sh
+psql -h localhost -U postgres -d postgres
+\c yanki_ecommerce
+```
+
+### 7. Query the Database from Terminal
+
+After connecting with `psql`, run these commands:
+
+List schemas:
+
+```sql
+\dn
+```
+
+List tables in `yanki` schema:
+
+```sql
+\dt yanki.*
+```
+
+Describe a table structure:
+
+```sql
+\d yanki.customers
+```
+
+Count rows in each table:
+
+```sql
+SELECT 'customers' AS table_name, COUNT(*) FROM yanki.customers
+UNION ALL
+SELECT 'products', COUNT(*) FROM yanki.products
+UNION ALL
+SELECT 'shipping_address', COUNT(*) FROM yanki.shipping_address
+UNION ALL
+SELECT 'orders', COUNT(*) FROM yanki.orders
+UNION ALL
+SELECT 'payment_method', COUNT(*) FROM yanki.payment_method;
+```
+
+Sample reporting queries:
+
+```sql
+SELECT COUNT(*) AS total_orders, SUM(total_price) AS total_revenue
+FROM yanki.orders;
+
+SELECT payment_method, COUNT(*) AS transactions
+FROM yanki.payment_method
+GROUP BY payment_method
+ORDER BY transactions DESC;
+```
+
+Exit `psql`:
+
+```sql
+\q
+```
+
 ## File Descriptions
 
 - `yanki.ipynb`: Main notebook with all ETL logic and database operations
