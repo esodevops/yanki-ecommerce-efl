@@ -47,3 +47,5 @@ htmlcov/
 # artifacts/
 # *.parquet
 # *.feather
+
+case_study/solutions.md
