@@ -1,0 +1,51 @@
+name: Yanki ETL Schedule
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  run-etl:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: yanki_ecommerce
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d yanki_ecommerce"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run ETL pipeline
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_NAME: yanki_ecommerce
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_SCHEMA: yanki
+          RAW_CSV_PATH: dataset/rawdata/yanki_ecommerce.csv
+          CLEAN_DATA_DIR: dataset/cleandata
+        run: |
+          python -m yanki_etl.main

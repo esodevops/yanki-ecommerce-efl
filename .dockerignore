@@ -1,0 +1,12 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.ipynb_checkpoints
+.env
+*.log
+README.md
+case_study
+scenarios
+yanki.ipynb

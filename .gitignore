@@ -41,6 +41,7 @@ htmlcov/
 # Local environment files
 .env
 .env.*
+!.env.example
 
 # Optional: ignore generated data outputs (keep raw inputs tracked)
 # outputs/

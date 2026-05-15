@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: yanki-postgres
+    environment:
+      POSTGRES_DB: yanki_ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d yanki_ecommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yanki-etl
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: yanki_ecommerce
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_SCHEMA: yanki
+      RAW_CSV_PATH: dataset/rawdata/yanki_ecommerce.csv
+      CLEAN_DATA_DIR: dataset/cleandata
+    volumes:
+      - ./dataset:/app/dataset
+    command: ["python", "-m", "yanki_etl.main"]
+
+volumes:
+  pgdata:
